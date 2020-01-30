@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: edgex-device-modbus
+  name: edgex-device-modbus
+spec:
+  type: NodePort
+  ports:
+  - name: "49991"
+    port: 49991
+    targetPort: 49991
+    nodePort: 30005
+  selector:
+    io.kompose.service: edgex-device-modbus
+status:
+  loadBalancer: {}

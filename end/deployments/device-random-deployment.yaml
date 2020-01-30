@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: edgex-device-random
+  name: edgex-device-random
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        io.kompose.service: edgex-device-random
+    spec:
+      containers:
+      - image: edgexfoundry/docker-device-random-go:1.0.0
+        name: edgex-device-random
+        ports:
+        - containerPort: 49988
+        resources: {}
+        volumeMounts:
+        - mountPath: /data/db
+          name: data-db
+        - mountPath: /edgex/logs
+          name: edgex-logs
+        - mountPath: /consul/config
+          name: consul-config
+        - mountPath: /consul/data
+          name: consul-data
+      restartPolicy: Always
+      volumes:
+      - name: data-db
+        hostPath:
+          path: /data/db
+      - name: edgex-logs
+        hostPath:
+          path: /edgex/logs
+      - name: consul-config
+        hostPath:
+          path: /consul/config
+      - name: consul-data
+        hostPath:
+          path: /consul/data
+status: {}

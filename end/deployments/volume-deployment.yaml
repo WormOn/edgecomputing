@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: edgex-files
+  name: edgex-files
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        io.kompose.service: edgex-files
+    spec:
+      nodeSelector:
+        name: edge-node
+      containers:
+      - image: edgexfoundry/docker-edgex-volume:1.0.0
+        name: edgex-files
+        resources: {}
+        volumeMounts:
+        - mountPath: /data/db
+          name: data-db
+        - mountPath: /edgex/logs
+          name: edgex-logs
+        - mountPath: /consul/config
+          name: consul-config
+        - mountPath: /consul/data
+          name: consul-data
+      restartPolicy: Always
+      volumes:
+      - name: data-db
+        hostPath:
+          path: /data/db
+      - name: edgex-logs
+        hostPath:
+          path: /edgex/logs
+      - name: consul-config
+        hostPath:
+          path: /consul/config
+      - name: consul-data
+        hostPath:
+          path: /consul/data
+status: {}

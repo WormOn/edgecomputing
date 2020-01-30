@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: edgex-device-random
+  name: edgex-device-random
+spec:
+  type: NodePort
+  ports:
+  - name: "49988"
+    port: 49988
+    targetPort: 49988
+    nodePort: 30006
+  selector:
+    io.kompose.service: edgex-device-random
+status:
+  loadBalancer: {}

@@ -1,0 +1,62 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: edgex-ui-go
+  name: edgex-ui-go
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        io.kompose.service: edgex-ui-go
+    spec:
+      nodeSelector:
+        name: edge-node
+      containers:
+      - image: edgex-ui:server
+        name: edgex-ui-go
+        ports:
+        - containerPort: 4000
+          hostPort: 4000
+        resources: {}
+        volumeMounts:
+        - mountPath: /data/db
+          name: data-db
+        - mountPath: /edgex/logs
+          name: edgex-logs
+        - mountPath: /consul/config
+          name: consul-config
+        - mountPath: /consul/data
+          name: consul-data
+      restartPolicy: Always
+      hostAliases:
+      - ip: "10.5.26.52"
+        hostnames:
+        - "edgex-core-consul"
+        - "edgex-core-data"
+        - "edgex-core-metadata"
+        - "edgex-support-logging"
+        - "edgex-mongo"
+        - "edgex-core-command"
+        - "edgex-support-notifications"
+        - "edgex-export-client"
+        - "edgex-export-distro"
+        - "edgex-support-rulesengine"
+        - "edgex-support-scheduler"
+        - "edgex-device-virtual"
+        - "edgex-vault"
+      volumes:
+      - name: data-db
+        hostPath:
+          path: /data/db
+      - name: edgex-logs
+        hostPath:
+          path: /edgex/logs
+      - name: consul-config
+        hostPath:
+          path: /consul/config
+      - name: consul-data
+        hostPath:
+          path: /consul/data
+status: {}

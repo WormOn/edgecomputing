@@ -1,0 +1,69 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: edgex-core-consul
+  name: edgex-core-consul
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        io.kompose.service: edgex-core-consul
+    spec:
+      nodeSelector:
+        name: edge-node
+      containers:
+      - image: consul:1.3.1
+        name: edgex-core-consul
+        ports:
+        - containerPort: 8300
+          hostPort: 8300
+        - containerPort: 8400
+          hostPort: 8400
+        - containerPort: 8500
+          hostPort: 8500
+        - containerPort: 8600
+          hostPort: 8600
+        resources: {}
+        volumeMounts:
+        - mountPath: /data/db
+          name: data-db
+        - mountPath: /edgex/logs
+          name: edgex-logs
+        - mountPath: /consul/config
+          name: consul-config
+        - mountPath: /consul/data
+          name: consul-data
+      restartPolicy: Always
+      hostAliases:
+      - ip: "10.5.26.52"
+        hostnames:
+        - "edgex-core-consul"
+        - "edgex-core-data"
+        - "edgex-core-consul"
+        - "edgex-core-metadata"
+        - "edgex-support-logging"
+        - "edgex-mongo"
+        - "edgex-core-command"
+        - "edgex-support-rulesengine.default.svc.cluster.local"
+        - "edgex-export-client"
+        - "edgex-export-distro"
+        - "edgex-support-notifications"
+        - "edgex-support-scheduler"
+        - "edgex-device-virtual"
+        - "edgex-device-mqtt"
+      volumes:
+      - name: data-db
+        hostPath:
+          path: /data/db
+      - name: edgex-logs
+        hostPath:
+          path: /edgex/logs
+      - name: consul-config
+        hostPath:
+          path: /consul/config
+      - name: consul-data
+        hostPath:
+          path: /consul/data
+status: {}

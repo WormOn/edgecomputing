@@ -1,0 +1,109 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: edgex-vault
+  name: edgex-vault
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        io.kompose.service: edgex-vault
+    spec:
+      nodeSelector:
+        name: edge-node
+      containers:
+      - image: vault:latest
+        name: edgex-vault
+        ports:
+        - containerPort: 8200
+          hostPort: 8200
+        resources: {}
+        volumeMounts:
+        - mountPath: /vault/config
+          name: vault-config
+        - mountPath: /vault/file
+          name: vault-file
+        - mountPath: /vault/logs
+          name: vault-logs
+        env: 
+          - name: VAULT_ADDR
+            value: https://edgex-vault:8200
+          - name: AULT_CONFIG_DIR
+            value: /vault/config
+          - name: VAULT_UI
+            value: "true"
+      restartPolicy: Always
+      hostAliases:
+      - ip: "10.5.26.52"
+        hostnames:
+        - "edgex-core-consul"
+        - "edgex-core-data"
+        - "edgex-core-consul"
+        - "edgex-core-metadata"
+        - "edgex-support-logging"
+        - "edgex-mongo"
+        - "edgex-core-command"
+        - "edgex-support-notifications"
+        - "edgex-export-client"
+        - "edgex-export-distro"
+        - "edgex-support-rulesengine"
+        - "edgex-support-scheduler"
+        - "edgex-device-virtual"
+        - "edgex-vault"
+      volumes:
+      - name: vault-config
+        hostPath:
+          path: /vault/config
+      - name: vault-file
+        hostPath:
+          path: /vault/file
+      - name: vault-logs
+        hostPath:
+          path: /vault/logs
+status: {}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: edgex-vault-worker
+  labels:
+    io.kompose.service: edgex-vault-worker
+spec:
+  template:
+    metadata:
+      labels:
+        io.kompose.service: edgex-vault-worker
+    spec: 
+      containers: 
+      - image: edgexfoundry/docker-edgex-vault-worker-go:1.0.0
+        name: edgex-vault-worker
+        imagePullPolicy: IfNotPresent
+        volumeMounts: 
+        - mountPath: /vault/config
+          name: vault-config
+        command: ["/edgex/edgex-vault-worker"]
+        args: ["--init=true", "--debug=false", "--wait=10", "--insureskipverify=false"]
+      volumes:
+      - name: vault-config
+        hostPath:
+          path: /vault/config
+      restartPolicy: OnFailure
+      hostAliases:
+      - ip: "10.5.26.52"
+        hostnames:
+        - "edgex-core-consul"
+        - "edgex-core-data"
+        - "edgex-core-consul"
+        - "edgex-core-metadata"
+        - "edgex-support-logging"
+        - "edgex-mongo"
+        - "edgex-core-command"
+        - "edgex-support-notifications"
+        - "edgex-export-client"
+        - "edgex-export-distro"
+        - "edgex-support-rulesengine"
+        - "edgex-support-scheduler"
+        - "edgex-device-virtual"
+        - "edgex-vault"

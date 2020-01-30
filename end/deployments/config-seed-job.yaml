@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: edgex-config-seed
+  name: edgex-config-seed
+spec:
+  template:
+    metadata:
+      labels:
+        io.kompose.service: edgex-config-seed
+    spec:
+      nodeSelector:
+        name: edge-node
+      containers:
+      - image: guqiaochina/docker-core-config-seed-go:1.0.0
+        name: edgex-config-seed
+        resources: {}
+        volumeMounts:
+        - mountPath: /data/db
+          name: data-db
+        - mountPath: /edgex/logs
+          name: edgex-logs
+        - mountPath: /consul/config
+          name: consul-config
+        - mountPath: /consul/data
+          name: consul-data
+      restartPolicy: Always
+      hostAliases:
+      - ip: "10.5.26.52"
+        hostnames:
+        - "edgex-core-consul"
+      volumes:
+      - name: data-db
+        hostPath:
+          path: /data/db
+      - name: edgex-logs
+        hostPath:
+          path: /edgex/logs
+      - name: consul-config
+        hostPath:
+          path: /consul/config
+      - name: consul-data
+        hostPath:
+          path: /consul/data
+status: {}
